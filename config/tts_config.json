@@ -1,0 +1,18 @@
+{   "api":{
+        "ms_tts": {
+            "ms_tts_region": "eastasia",
+            "ms_tts_api_secret": "45e54560126a49ba8d7bab4e757836d7"
+        },
+        "xf_tts":{
+            "xf_tts_app_id": "0c0c2662",
+            "xf_tts_api_secret": "NzE2MjRiMGE1ZTc1NzBiOTFlODk5MzNj",
+            "xf_tts_api_key": "3f9aff085f57e4fc2722de717d0a4661"
+        }
+    },
+    "model": {
+        "bert-vits2": {},
+        "sambert": {}
+    }
+}
+
+
