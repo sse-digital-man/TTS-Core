@@ -7,7 +7,6 @@ class tts_type(Enum):
     API = 1
     LOCAL = 2
 
-
 class TTSController:
     def __init__(self, config_path='../config/tts_config.json'):
         self.api_tts = ApiTTS(config_path=config_path)
