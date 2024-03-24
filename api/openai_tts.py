@@ -35,11 +35,13 @@ class OpenAIAPI(ConfigurableModel, GenerativeModel):
         )
 
         response.stream_to_file(self.speech_file_path)
+        return self.speech_file_path
 
-
+'''
 if __name__ == '__main__':
     # Example usage
     test_api_tts = api_tts.ApiTTS()
     openai_tts = OpenAIAPI(test_api_tts)
     input_text = "感谢来到直播间的粉丝们，我直播时间一般是10点到12点，大家记得准时来哦，我们每天都有福利哒。"
     openai_tts.synthesize(input_text)
+'''

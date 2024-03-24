@@ -90,8 +90,11 @@ class IflytekApi(ConfigurableModel, GenerativeModel):
         ws_client = WebSocketClient(
             ws_param, on_message, on_error, on_close)
         ws_client.run()
+        # return self.speech_file_path
         # 将生成的 PCM 文件转换为 WAV 文件
-        # pcm2wav(self.speech_file_path, replace_suffix(self.speech_file_path, '.pcm', '.wav'))
+        pcm2wav(self.speech_file_path, replace_suffix(self.speech_file_path, '.pcm', '.wav'))
+        wav_file_path = os.path.splitext(self.speech_file_path)[0] + '.wav'
+        return wav_file_path
 
 
 def replace_suffix(original_string, old_suffix, new_suffix):
@@ -224,7 +227,7 @@ class WebSocketClient:
 
         thread.start_new_thread(run, ())
 
-
+'''
 # BUG 无法建立连接
 if __name__ == '__main__':
     # Example usage
@@ -232,3 +235,4 @@ if __name__ == '__main__':
     iflytek_tts = IflytekApi(test_api_tts)
     input_text = "感谢来到直播间的粉丝们，我直播时间一般是10点到12点，大家记得准时来哦，我们每天都有福利哒。"
     iflytek_tts.synthesize(input_text)
+'''
