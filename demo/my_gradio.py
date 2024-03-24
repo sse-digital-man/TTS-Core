@@ -3,10 +3,11 @@ import os
 import tempfile
 import tempfile
 import anyio
-from src.api_tts import ApiTTS
 
 from azure.cognitiveservices.speech import AudioDataStream, SpeechSynthesizer
 import azure.cognitiveservices.speech as speechsdk
+
+from src.api_tts import ApiTTS
 
 from scipy.io import wavfile
 from scipy.io.wavfile import write

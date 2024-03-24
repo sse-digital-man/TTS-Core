@@ -14,34 +14,40 @@ from wsgiref.handlers import format_date_time
 from datetime import datetime
 import wave
 
+# 定义一些常量，用于标识音频帧的状态
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
 
+# 定义 IflytekApi 类，继承自 ConfigurableModel 和 GenerativeModel
 class IflytekApi(ConfigurableModel, GenerativeModel):
     def __init__(self, ApiTTS):
-        self.file_name = None
+        self.file_name = None  # 初始化文件名和路径
         self.speech_file_path = None
-        self.api_config = ApiTTS.api_config
+        self.api_config = ApiTTS.api_config  # 获取API配置信息
         self._initialize()
 
     def _initialize(self):
+        # 从API配置中获取讯飞语音合成相关的配置信息
         iflytek_api_config = self.api_config['xf_tts']
         self.xf_tts_app_id = iflytek_api_config['xf_tts_app_id']
         self.xf_tts_api_secret = iflytek_api_config['xf_tts_api_secret']
         self.xf_tts_api_key = iflytek_api_config['xf_tts_api_key']
 
     def synthesize(self, text, output_dir=r'..\out'):
+        # 创建 WebSocket 参数对象
         ws_param = Ws_Param(
             APPID=self.xf_tts_app_id,
             APISecret=self.xf_tts_api_secret,
             APIKey=self.xf_tts_api_key,
             Text=text
         )
+        # 生成语音文件名和路径
         self.file_name = f'{datetime.now().strftime("%Y%m%d%H%M%S")}.pcm'
         self.speech_file_path = os.path.join(output_dir, self.file_name)
 
+        # 定义接收 WebSocket 消息的回调函数
         def on_message(ws, message):
             try:
                 message = json.loads(message)
@@ -51,6 +57,7 @@ class IflytekApi(ConfigurableModel, GenerativeModel):
                 audio = base64.b64decode(audio)
                 status = message["data"]["status"]
                 # print(message)
+                # 根据状态处理音频数据
                 if status == 2:
                     print("ws is closed")
                     ws.close()
@@ -64,15 +71,19 @@ class IflytekApi(ConfigurableModel, GenerativeModel):
             except Exception as e:
                 print("receive msg,but parse exception:", e)
 
+        # 定义 WebSocket 错误回调函数
         def on_error(ws, error):
             print("### error:", error)
 
+        # 定义 WebSocket 关闭回调函数
         def on_close(ws):
             print("### closed ###")
 
+        # 创建 WebSocket 客户端对象并运行
         ws_client = WebSocketClient(
             ws_param, on_message, on_error, on_close)
         ws_client.run()
+        # 将生成的 PCM 文件转换为 WAV 文件
         pcm2wav(self.speech_file_path, replace_suffix(self.speech_file_path, '.pcm', '.wav'))
 
 
@@ -84,6 +95,7 @@ def replace_suffix(original_string, old_suffix, new_suffix):
         return original_string
 
 
+# 定义将 PCM 文件转换为 WAV 文件的函数
 def pcm2wav(pcm_file, wav_file, channels=1, bits=16, sample_rate=16000):
     # 打开 PCM 文件
     pcmfile = open(pcm_file, 'rb')
@@ -108,6 +120,7 @@ def pcm2wav(pcm_file, wav_file, channels=1, bits=16, sample_rate=16000):
     wavfile.close()
 
 
+# 定义 WebSocket 参数类
 class Ws_Param(object):
     # 初始化
     def __init__(self, APPID, APIKey, APISecret, Text):
@@ -129,6 +142,7 @@ class Ws_Param(object):
     # 生成url
     def create_url(self):
         url = 'wss://tts-api.xfyun.cn/v2/tts'
+
         # 生成RFC1123格式的时间戳
         now = datetime.now()
         date = format_date_time(mktime(now.timetuple()))
@@ -137,6 +151,7 @@ class Ws_Param(object):
         signature_origin = "host: " + "ws-api.xfyun.cn" + "\n"
         signature_origin += "date: " + date + "\n"
         signature_origin += "GET " + "/v2/tts " + "HTTP/1.1"
+
         # 进行hmac-sha256进行加密
         signature_sha = hmac.new(self.APISecret.encode('utf-8'), signature_origin.encode('utf-8'),
                                  digestmod=hashlib.sha256).digest()
@@ -147,6 +162,7 @@ class Ws_Param(object):
             self.APIKey, "hmac-sha256", "host date request-line", signature_sha)
         authorization = base64.b64encode(
             authorization_origin.encode('utf-8')).decode(encoding='utf-8')
+
         # 将请求的鉴权参数组合为字典
         v = {
             "authorization": authorization,
@@ -162,6 +178,7 @@ class Ws_Param(object):
         return url
 
 
+# 定义 WebSocket 客户端类
 class WebSocketClient:
     def __init__(self, ws_param, on_message_callback, on_error_callback, on_close_callback):
         self.ws_param = ws_param
@@ -170,6 +187,7 @@ class WebSocketClient:
         self.on_error_callback = on_error_callback
         self.on_close_callback = on_close_callback
 
+    # 运行 WebSocket 客户端
     def run(self):
         websocket.enableTrace(False)
         ws = websocket.WebSocketApp(
@@ -181,6 +199,7 @@ class WebSocketClient:
         ws.on_open = self.on_open
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
+    # WebSocket 连接打开时的回调函数
     def on_open(self, ws):
         def run(*args):
             data = {
