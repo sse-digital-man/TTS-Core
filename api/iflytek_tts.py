@@ -2,6 +2,8 @@ import hashlib
 import hmac
 import os
 from time import mktime
+
+from src import api_tts
 from src.interface import ConfigurableModel, GenerativeModel
 import websocket
 import json
@@ -30,22 +32,26 @@ class IflytekApi(ConfigurableModel, GenerativeModel):
 
     def _initialize(self):
         # 从API配置中获取讯飞语音合成相关的配置信息
-        iflytek_api_config = self.api_config['xf_tts']
-        self.xf_tts_app_id = iflytek_api_config['xf_tts_app_id']
-        self.xf_tts_api_secret = iflytek_api_config['xf_tts_api_secret']
-        self.xf_tts_api_key = iflytek_api_config['xf_tts_api_key']
+        iflytek_api_config = self.api_config['iflytek_tts']
+        self.iflytek_tts_app_id = iflytek_api_config['iflytek_tts_app_id']
+        self.iflytek_tts_api_secret = iflytek_api_config['iflytek_tts_api_secret']
+        self.iflytek_tts_api_key = iflytek_api_config['iflytek_tts_api_key']
+        # print(self.iflytek_tts_api_key)
+        # print(self.iflytek_tts_app_id)
+        # print(self.iflytek_tts_api_secret)
 
     def synthesize(self, text, output_dir=r'..\out'):
         # 创建 WebSocket 参数对象
         ws_param = Ws_Param(
-            APPID=self.xf_tts_app_id,
-            APISecret=self.xf_tts_api_secret,
-            APIKey=self.xf_tts_api_key,
+            APPID=self.iflytek_tts_app_id,
+            APISecret=self.iflytek_tts_api_secret,
+            APIKey=self.iflytek_tts_api_key,
             Text=text
         )
         # 生成语音文件名和路径
-        self.file_name = f'{datetime.now().strftime("%Y%m%d%H%M%S")}.pcm'
+        self.file_name = f'{datetime.now().strftime("IFLYTEK_TTS-%Y%m%d%H%M%S")}.pcm'
         self.speech_file_path = os.path.join(output_dir, self.file_name)
+        print(self.speech_file_path)
 
         # 定义接收 WebSocket 消息的回调函数
         def on_message(ws, message):
@@ -80,11 +86,12 @@ class IflytekApi(ConfigurableModel, GenerativeModel):
             print("### closed ###")
 
         # 创建 WebSocket 客户端对象并运行
+        print("connecting to ws_client")
         ws_client = WebSocketClient(
             ws_param, on_message, on_error, on_close)
         ws_client.run()
         # 将生成的 PCM 文件转换为 WAV 文件
-        pcm2wav(self.speech_file_path, replace_suffix(self.speech_file_path, '.pcm', '.wav'))
+        # pcm2wav(self.speech_file_path, replace_suffix(self.speech_file_path, '.pcm', '.wav'))
 
 
 def replace_suffix(original_string, old_suffix, new_suffix):
@@ -186,7 +193,7 @@ class WebSocketClient:
         self.on_message_callback = on_message_callback
         self.on_error_callback = on_error_callback
         self.on_close_callback = on_close_callback
-
+        print('init websocket client')
     # 运行 WebSocket 客户端
     def run(self):
         websocket.enableTrace(False)
@@ -196,12 +203,14 @@ class WebSocketClient:
             on_error=self.on_error_callback,
             on_close=self.on_close_callback
         )
+        print('websocket')
         ws.on_open = self.on_open
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
     # WebSocket 连接打开时的回调函数
     def on_open(self, ws):
         def run(*args):
+            print("on_open")
             data = {
                 "common": self.ws_param.CommonArgs,
                 "business": self.ws_param.BusinessArgs,
@@ -214,3 +223,12 @@ class WebSocketClient:
                 os.remove('./out/iflytek_demo.pcm')
 
         thread.start_new_thread(run, ())
+
+
+# BUG 无法建立连接
+if __name__ == '__main__':
+    # Example usage
+    test_api_tts = api_tts.ApiTTS()
+    iflytek_tts = IflytekApi(test_api_tts)
+    input_text = "感谢来到直播间的粉丝们，我直播时间一般是10点到12点，大家记得准时来哦，我们每天都有福利哒。"
+    iflytek_tts.synthesize(input_text)

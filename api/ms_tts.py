@@ -2,10 +2,9 @@ import os
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import AudioDataStream
 from datetime import datetime
+
+from src import api_tts
 from src.interface import ConfigurableModel, GenerativeModel
-
-
-# from src.api_tts import ApiTTS
 
 
 # 定义 MSApi 类，继承自 ConfigurableModel 和 GenerativeModel
@@ -31,11 +30,11 @@ class MSApi(ConfigurableModel, GenerativeModel):
         speech_config.speech_synthesis_voice_name = 'zh-CN-XiaohanNeural'
 
         # 生成语音文件名和路径
-        file_name = f'{datetime.now().strftime("%Y%m%d%H%M%S")}.wav'
-        speech_file_path = os.path.join(output_dir, file_name)
+        self.file_name = f'{datetime.now().strftime("MS_TTS-%Y%m%d%H%M%S")}.wav'
+        self.speech_file_path = os.path.join(output_dir, self.file_name)
 
         # 文件输出
-        audio_config = speechsdk.audio.AudioOutputConfig(filename=speech_file_path)
+        audio_config = speechsdk.audio.AudioOutputConfig(filename=self.speech_file_path)
 
         # 创建语音合成器对象，设置语音合成的配置和输出
         speech_synthesizer = speechsdk.SpeechSynthesizer(
@@ -48,9 +47,9 @@ class MSApi(ConfigurableModel, GenerativeModel):
         # 根据合成结果的原因进行相应的处理
         if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
             stream = AudioDataStream(speech_synthesis_result)
-            stream.save_to_wav_file(speech_file_path)
+            stream.save_to_wav_file(self.speech_file_path)
             print(f"Speech synthesized for text: {text}")
-            print(f"File saved at: {speech_file_path}")
+            print(f"File saved at: {self.speech_file_path}")
         elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
             cancellation_details = speech_synthesis_result.cancellation_details
             print("Speech synthesis canceled: {}".format(
@@ -65,7 +64,7 @@ class MSApi(ConfigurableModel, GenerativeModel):
 
 if __name__ == '__main__':
     # Example usage
-    api_tts = api_tts.ApiTTS()
-    synthesizer = MSApi(api_tts)
+    test_api_tts = api_tts.ApiTTS()
+    synthesizer = MSApi(test_api_tts)
     text_to_synthesize = "感谢来到直播间的粉丝们，我直播时间一般是10点到12点..."
     synthesizer.synthesize(text_to_synthesize)
