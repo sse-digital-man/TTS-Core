@@ -60,11 +60,14 @@ class MSApi(ConfigurableModel, GenerativeModel):
                         cancellation_details.error_details))
                     print(
                         "Did you set the speech resource key and region values?")
+        return self.speech_file_path
 
 
+'''
 if __name__ == '__main__':
     # Example usage
     test_api_tts = api_tts.ApiTTS()
     synthesizer = MSApi(test_api_tts)
     text_to_synthesize = "感谢来到直播间的粉丝们，我直播时间一般是10点到12点..."
     synthesizer.synthesize(text_to_synthesize)
+'''

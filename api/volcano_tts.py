@@ -65,10 +65,12 @@ class VolcanoAPI(ConfigurableModel, GenerativeModel):
                 file_to_save.write(base64.b64decode(data))
         except Exception as e:
             print(f"Error occurred: {e}")
+        return self.speech_file_path
 
-
+'''
 if __name__ == '__main__':
     test_api_tts = api_tts.ApiTTS()
     volcano_tts = VolcanoAPI(test_api_tts)
     text_to_synthesize = "感谢来到直播间的粉丝们，我直播时间一般是10点到12点，大家记得准时来哦，我们每天都有福利哒。"
     volcano_tts.synthesize(text_to_synthesize)
+'''
