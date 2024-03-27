@@ -1,19 +1,20 @@
+import _thread as thread
+import base64
 import hashlib
 import hmac
-import os
-from time import mktime
-
-from src.interface import ConfigurableModel, GenerativeModel
-import websocket
 import json
-import _thread as thread
 import os
 import ssl
-import base64
+import time
+import wave
+from datetime import datetime
+from time import mktime
 from urllib.parse import urlencode
 from wsgiref.handlers import format_date_time
-from datetime import datetime
-import wave
+import threading
+import websocket
+
+from src.interface import ConfigurableModel, GenerativeModel
 
 # 定义一些常量，用于标识音频帧的状态
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
@@ -87,9 +88,8 @@ class IflytekApi(ConfigurableModel, GenerativeModel):
         # 创建 WebSocket 客户端对象并运行
         print("connecting to ws_client")
         ws_client = WebSocketClient(
-            ws_param, on_message, on_error, on_close)
+            ws_param, on_message, on_error, on_close, self.speech_file_path)
         ws_client.run()
-        # return self.speech_file_path
         # 将生成的 PCM 文件转换为 WAV 文件
         pcm2wav(self.speech_file_path, replace_suffix(self.speech_file_path, '.pcm', '.wav'))
         wav_file_path = os.path.splitext(self.speech_file_path)[0] + '.wav'
@@ -189,13 +189,16 @@ class Ws_Param(object):
 
 # 定义 WebSocket 客户端类
 class WebSocketClient:
-    def __init__(self, ws_param, on_message_callback, on_error_callback, on_close_callback):
+    def __init__(self, ws_param, on_message_callback, on_error_callback, on_close_callback, speech_file_path):
         self.ws_param = ws_param
         self.ws_url = self.ws_param.create_url()
         self.on_message_callback = on_message_callback
         self.on_error_callback = on_error_callback
         self.on_close_callback = on_close_callback
+        self.speech_file_path = speech_file_path
+        self.opened = threading.Event()
         print('init websocket client')
+
     # 运行 WebSocket 客户端
     def run(self):
         websocket.enableTrace(False)
@@ -206,12 +209,15 @@ class WebSocketClient:
             on_close=self.on_close_callback
         )
         print('websocket')
-        ws.on_open = self.on_open
+        ws.on_open = lambda ws: self.on_open(ws)
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+        self.opened.wait()  # 等待连接开启
+        print('websocket finish')
 
     # WebSocket 连接打开时的回调函数
     def on_open(self, ws):
         def run(*args):
+            self.opened.set()
             print("on_open")
             data = {
                 "common": self.ws_param.CommonArgs,
@@ -221,13 +227,13 @@ class WebSocketClient:
             data = json.dumps(data)
             print("------>开始发送文本数据")
             ws.send(data)
-            if os.path.exists('./out/iflytek_demo.pcm'):
-                os.remove('./out/iflytek_demo.pcm')
+            if os.path.exists(self.speech_file_path):
+                os.remove(self.speech_file_path)
 
         thread.start_new_thread(run, ())
 
+
 '''
-# BUG 无法建立连接
 if __name__ == '__main__':
     # Example usage
     test_api_tts = api_tts.ApiTTS()
