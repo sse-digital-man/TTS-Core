@@ -36,7 +36,7 @@ def api(text, api_type):
         _ApiTTS.change_api('ms')
     elif api_type == 'iflytek':
         _ApiTTS.change_api('iflytek')
-    _ApiTTS.synthesize(text)
+    return _ApiTTS.synthesize(text)
 
 
 def create_app():
