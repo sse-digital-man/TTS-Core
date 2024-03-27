@@ -1,7 +1,3 @@
-from api.ms_tts import MSApi
-from api.iflytek_tts import IflytekApi
-from api.openai_tts import OpenAIAPI
-from api.volcano_tts import VolcanoAPI
 from local_tts import LocalTTS
 from api_tts import ApiTTS
 from enum import Enum
@@ -55,7 +51,7 @@ if __name__ == "__main__":
     audio_manager = AudioQueueManager()
 
     test_api_tts = ApiTTS()
-    test_api_tts.change_api('openai')
+    test_api_tts.change_api('iflytek')
 
     text_input = "Hello, this is a test."
     speech_output = test_api_tts.synthesize(text_input)
