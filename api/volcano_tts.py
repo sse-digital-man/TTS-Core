@@ -5,7 +5,6 @@ import requests
 from datetime import datetime
 import os
 
-from src import api_tts
 from src.interface import ConfigurableModel, GenerativeModel
 
 

@@ -3,7 +3,6 @@ import os
 import random
 from datetime import datetime
 
-from src import api_tts
 from src.interface import ConfigurableModel, GenerativeModel
 
 

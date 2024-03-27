@@ -3,7 +3,6 @@ import hmac
 import os
 from time import mktime
 
-from src import api_tts
 from src.interface import ConfigurableModel, GenerativeModel
 import websocket
 import json

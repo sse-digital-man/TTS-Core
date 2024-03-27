@@ -3,7 +3,6 @@ import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import AudioDataStream
 from datetime import datetime
 
-from src import api_tts
 from src.interface import ConfigurableModel, GenerativeModel
 
 
