@@ -36,6 +36,10 @@ def api(text, api_type):
         _ApiTTS.change_api('ms')
     elif api_type == 'iflytek':
         _ApiTTS.change_api('iflytek')
+    elif api_type == 'openai':
+        _ApiTTS.change_api('openai')
+    elif api_type == 'volcano':
+        _ApiTTS.change_api('volcano')
     return _ApiTTS.synthesize(text)
 
 
@@ -59,7 +63,7 @@ def create_app():
             with gr.Row():
                 with gr.Column():
                     api_type = gr.Dropdown(choices=[
-                        'ms', 'iflytek'], label='请选择模型')
+                        'ms', 'iflytek', 'openai', 'volcano'], label='请选择模型')
 
                 with gr.Column():
                     inp_text = gr.Textbox(
