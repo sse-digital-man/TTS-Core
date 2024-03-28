@@ -23,6 +23,8 @@ class MSApi(ConfigurableModel, GenerativeModel):
             subscription=self.subscription_key, region=self.region)
 
     def synthesize(self, text, output_dir=r'..\out'):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
         speech_config = self.speech_config
 

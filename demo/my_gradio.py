@@ -40,7 +40,7 @@ def api(text, api_type):
         _ApiTTS.change_api('openai')
     elif api_type == 'volcano':
         _ApiTTS.change_api('volcano')
-    _ApiTTS.synthesize(text)
+    return _ApiTTS.synthesize(text)
 
 
 def create_app():
