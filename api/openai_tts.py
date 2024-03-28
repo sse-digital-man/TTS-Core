@@ -21,6 +21,8 @@ class OpenAIAPI(ConfigurableModel, GenerativeModel):
         self.client = OpenAI(api_key=self.api_key, base_url='https://api.chatanywhere.tech/v1')
 
     def synthesize(self, input_text, output_dir=r'..\out'):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         v = self.voice[1]
         self.file_name = f"{datetime.now().strftime('OPENAI_TTS-%Y%m%d%H%M%S')}.mp3"
         self.speech_file_path = os.path.join(output_dir, self.file_name)
