@@ -40,5 +40,7 @@ PyYAML
 numpy
 huggingface_hub
 azure-cognitiveservices-speech
-websocket
+websocket==0.2.1
+websocket-client==0.56.0
+websockets==11.0.3
 openai

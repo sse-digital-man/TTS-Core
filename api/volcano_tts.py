@@ -26,6 +26,8 @@ class VolcanoAPI(ConfigurableModel, GenerativeModel):
         self.header = {"Authorization": f"Bearer;{self.access_token}"}
 
     def synthesize(self, text, output_dir=r'..\out'):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         request_json = {
             "app": {
                 "appid": self.appid,

@@ -41,6 +41,8 @@ class IflytekApi(ConfigurableModel, GenerativeModel):
         # print(self.iflytek_tts_api_secret)
 
     def synthesize(self, text, output_dir=r'..\out'):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         # 创建 WebSocket 参数对象
         ws_param = Ws_Param(
             APPID=self.iflytek_tts_app_id,
