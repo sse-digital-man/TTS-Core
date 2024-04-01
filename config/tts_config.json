@@ -1,19 +1,19 @@
 {   "api": {
         "ms_tts": {
-            "ms_tts_region": "eastasia",
-            "ms_tts_api_secret": "45e54560126a49ba8d7bab4e757836d7"
+            "ms_tts_region": "TODO",
+            "ms_tts_api_secret": "TODO"
         },
         "iflytek_tts":{
-            "iflytek_tts_app_id": "0c0c2662",
-            "iflytek_tts_api_secret": "NzE2MjRiMGE1ZTc1NzBiOTFlODk5MzNj",
-            "iflytek_tts_api_key": "3f9aff085f57e4fc2722de717d0a4661"
+            "iflytek_tts_app_id": "TODO",
+            "iflytek_tts_api_secret": "TODO",
+            "iflytek_tts_api_key": "TODO"
         },
         "openai_tts": {
-          "openai_tts_api_key":"sk-uSKo0dTF8Zn5TRWNL1evFQza4NnsAAYgqlAaXDTLmrvKPFPT"
+          "openai_tts_api_key":"TODO"
         },
         "volcano_tts": {
-          "volcano_tts_app_id": "8820207763",
-          "volcano_tts_access_token": "aVJgZicgTlp4INHB7Yef_hdMmJd99mFc"
+          "volcano_tts_app_id": "TODO",
+          "volcano_tts_access_token": "TODO"
         }
     },
     "model": {
